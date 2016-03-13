@@ -1,10 +1,10 @@
-package com.agents
+package com.abetterway2feel.playgorund.akka.actors
 
-import java.util.{UUID, Properties}
+import java.util.UUID
 
-import akka.actor.{ActorRefFactory, Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, ActorRefFactory, Props}
+import com.abetterway2feel.playgorund.akka.actors.ConfigHolderActor.Update
 import com.agents.ConfigHolder.Config
-import com.agents.ConfigHolderActor.{Update, Start}
 
 import scala.concurrent.duration._
 
@@ -18,6 +18,7 @@ object ConfigHolderActor {
 }
 
 class ConfigHolderActor extends Actor with ActorLogging {
+  import context._
 
   override def aroundPostRestart(exception: Throwable) = {
     self ! Update
