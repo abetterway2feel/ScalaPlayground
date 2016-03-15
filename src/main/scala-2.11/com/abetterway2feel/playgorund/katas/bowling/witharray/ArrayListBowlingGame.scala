@@ -1,12 +1,14 @@
-package com.abetterway2feel.playgorund.katas.bowling.simple
+package com.abetterway2feel.playgorund.katas.bowling.witharray
 
-class BowlingGame() {
+import com.abetterway2feel.playgorund.katas.bowling.{GameOverException, BowlingGame}
+
+class ArrayListBowlingGame() extends BowlingGame {
 
   private[this] val frames: Array[Frame] = Array.fill(12)(Frame())
 
   private[this] var currentFrameNumber = 0
 
-  def score: Int = {
+  override def score: Int = {
     var frameNumber = 0
     def calculateBonus(frame: Frame): Int = {
       if (frame.isStrike) {
@@ -30,7 +32,7 @@ class BowlingGame() {
     }
   }
 
-  def roll(pins: Int): BowlingGame = {
+  override def roll(pins: Int) = {
     if (isGameOver) throw GameOverException("Game over")
 
     val currentFrame = frames(currentFrameNumber)
@@ -78,4 +80,3 @@ case class Frame(roll1: Option[Int] = None, roll2: Option[Int] = None) {
   }
 }
 
-case class GameOverException(message: String) extends Exception(message)
