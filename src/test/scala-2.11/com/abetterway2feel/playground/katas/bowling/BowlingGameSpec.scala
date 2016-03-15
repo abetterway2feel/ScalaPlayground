@@ -1,32 +1,43 @@
 package com.abetterway2feel.playground.katas.bowling
 
-import com.abetterway2feel.playgorund.katas.bowling.simple.{GameOverException, Frame, BowlingGame}
+import com.abetterway2feel.playgorund.katas.bowling.inheritance.StateMachineBowlingGame
+import com.abetterway2feel.playgorund.katas.bowling.witharray.ArrayListBowlingGame
+import com.abetterway2feel.playgorund.katas.bowling.{GameOverException, BowlingGame}
+import com.abetterway2feel.playgorund.katas.bowling.linkedList.LinkedListBowlingGame
 import org.scalatest.{Matchers, FlatSpec}
 
 class BowlingGameSpec extends FlatSpec with Matchers {
 
-  "Bowling Game" should "store 4 as roll1 and None as roll2" in {
-    new BowlingGame().roll(4).score should be(4)
+  def linkedListVersion =  new LinkedListBowlingGame
+  def arrayListVersion =  new ArrayListBowlingGame
+  def stateMachineVersion =  new StateMachineBowlingGame
+
+  def newGame: BowlingGame = {
+    stateMachineVersion
   }
 
-  it should "store 4 as roll1 and 5 as roll2 and game score as 9" in {
-    new BowlingGame().roll(4).roll(5).score should be(9)
+  "The game score" should "be 4 after a single roll of 4" in {
+    newGame.roll(4).score should be(4)
   }
 
-  it should "store 2 as roll1 and 4 as roll2 and game score as 6" in {
-    new BowlingGame().roll(2).roll(4).score should be(6)
+  it should "be 9 after a roll of 4 and a roll of 5" in {
+    newGame.roll(4).roll(5).score should be(9)
   }
 
-  it should "store 10 as roll1 and None as roll2 when the player gets a strike" in {
-    new BowlingGame().roll(10).score should be(10)
+  it should "be 6 after a single roll of 2 and a roll of 4" in {
+    newGame.roll(2).roll(4).score should be(6)
   }
 
-  it should "store 10 as roll1 and 20 as roll2" in {
-    new BowlingGame().roll(10).roll(10).score should be(30)
+  it should "be 10 after a single strike" in {
+    newGame.roll(10).score should be(10)
   }
 
-  it should "calculate the score for two spares correctly" in {
-    new BowlingGame()
+  it should "be 30 after two strikes" in {
+    newGame.roll(10).roll(10).score should be(30)
+  }
+
+  it should "be 25 after 4 rolls of 5" in {
+    newGame
       .roll(5)
       .roll(5)
       .roll(5)
@@ -34,27 +45,8 @@ class BowlingGameSpec extends FlatSpec with Matchers {
       .score should be(25)
   }
 
-  it should "too many rolls will result in a game over exception " in {
-    intercept[GameOverException] {
-      new BowlingGame()
-        .roll(10)
-        .roll(10)
-        .roll(10)
-        .roll(10)
-        .roll(10)
-        .roll(10)
-        .roll(10)
-        .roll(10)
-        .roll(10)
-        .roll(1)
-        .roll(1)
-        .roll(1)
-
-    }
-  }
-
-  it should "calculate a perfect game correctly" in {
-    new BowlingGame()
+  it should "be 300 after a perfect game" in {
+    newGame
       .roll(10)
       .roll(10)
       .roll(10)
@@ -70,8 +62,8 @@ class BowlingGameSpec extends FlatSpec with Matchers {
       .score should be(300)
   }
 
-  it should "calculate a half perfect game correctly" in {
-    new BowlingGame()
+  it should "150 after a half perfect game" in {
+    newGame
       .roll(5)
       .roll(5) //1
       .roll(5)
@@ -97,8 +89,8 @@ class BowlingGameSpec extends FlatSpec with Matchers {
       .score should be(150)
   }
 
-  it should "calculate Solo's game correctly" in {
-    new BowlingGame()
+  it should "135 after Solo's game" in {
+    newGame
       .roll(7)
       .roll(2) //1
       .roll(7)
@@ -122,6 +114,33 @@ class BowlingGameSpec extends FlatSpec with Matchers {
       .roll(5)
 
       .score should be(135)
+  }
+
+  "The game " should "be over after 10 rolls" in {
+    intercept[GameOverException] {
+      newGame
+        .roll(1)
+        .roll(1) //1
+        .roll(1)
+        .roll(1) //2
+        .roll(1)
+        .roll(1) //3
+        .roll(1)
+        .roll(1) //4
+        .roll(1)
+        .roll(1) //5
+        .roll(1)
+        .roll(1) //6
+        .roll(1)
+        .roll(1) //7
+        .roll(1)
+        .roll(1) //8
+        .roll(1)
+        .roll(1) //9
+        .roll(1)
+        .roll(1) //10
+        .roll(1) //Game Over
+    }
   }
 
 }
