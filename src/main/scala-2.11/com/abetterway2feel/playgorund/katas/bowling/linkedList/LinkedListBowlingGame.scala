@@ -56,7 +56,7 @@ final case class Frame(val frame: Int,
   val isStrike = roll1 == 10
   def isSpare: Boolean = !isStrike && rawScore == 10
 
-  def score = rawScore + bonus
+  def score = rawScore + (if(frame < 10) bonus else 0)
 
   private[Frame] def rawScore: Int = roll1 + roll2.fold(0)(identity)
 
@@ -64,13 +64,10 @@ final case class Frame(val frame: Int,
     if (isStrike)
       nextFrame.fold(0)(
         next =>
-          if (next.frame < 11)
-            next.rawScore + next.nextFrame.fold(0)(
-              oneAfter =>
-                oneAfter.rawScore
-            )
-          else
-            0
+          next.rawScore + (if (next.isStrike)
+            next.nextFrame.fold(0)(
+              oneAfter => oneAfter.roll1
+            ) else 0)
       )
     else if (isSpare)
       nextFrame.fold(0){
