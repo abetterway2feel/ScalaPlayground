@@ -18,7 +18,7 @@ class LinkedListBowlingGame() extends BowlingGame {
     score
   }
 
-  override def roll(pins: Int): LinkedListBowlingGame = {
+  override def roll(pins: Int) = {
     if (isGameOver) throw GameOverException("Game over")
 
     currentFrame.fold {

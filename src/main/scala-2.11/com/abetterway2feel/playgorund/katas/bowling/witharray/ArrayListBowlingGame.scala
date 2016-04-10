@@ -32,7 +32,7 @@ class ArrayListBowlingGame() extends BowlingGame {
     }
   }
 
-  override def roll(pins: Int): BowlingGame = {
+  override def roll(pins: Int) = {
     if (isGameOver) throw GameOverException("Game over")
 
     val currentFrame = frames(currentFrameNumber)

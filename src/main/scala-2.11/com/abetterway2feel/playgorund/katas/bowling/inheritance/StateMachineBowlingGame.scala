@@ -4,29 +4,33 @@ import com.abetterway2feel.playgorund.katas.bowling.{BowlingGame, GameOverExcept
 
 class StateMachineBowlingGame extends BowlingGame {
 
-  private[this] var state: Frame = NotStarted
+  private[this] var state: FrameState = NotStarted
 
+  def printState:this.type = {
+    println(state)
+    this
+  }
   override def score: Int = state.score
 
-  override def roll(pins: Int): BowlingGame = {
+  override def roll(pins: Int) = {
     if (isGameOver) throw GameOverException("Game over")
     val newScore = state.score + pins
 
-    def getBonus(frame: Frame, currentState: Boolean): Int = {
-      frame match {
-        case NotStarted => 0
-        case FrameComplete(frameNo,_, roll1, roll2, _) if currentState & frameNo < 10 =>
-          roll1 + roll2 match {
-            case 10 => pins
-            case other => 0
-          }
+    def getPreviousBonus(current: FrameComplete): Int = {
+      val frameScore = current.roll1 + current.roll2
 
-        case FrameComplete(frameNo,_, 10, 0, _) if !currentState & frameNo < 10 =>
-          pins
+      (current.previous map {
+        case strike@Strike(frameNo) if frameNo <= 10 =>
+          frameScore + (strike.previous map {
+            case previousStrike @ Strike(_) =>
+              current.roll1
+            case _  => 0
+          }).get
+        case spare @ Spare(frameNo) if frameNo <= 10 =>
+          current.roll1
+        case _ => 0
+      }).get
 
-        case other =>
-          0
-      }
     }
 
     state = state match {
@@ -36,26 +40,28 @@ class StateMachineBowlingGame extends BowlingGame {
         else
           GameOver(newScore)
 
-      case BonusShot(_)  =>
+      case BonusShot(_) =>
         GameOver(newScore)
+
       case gameOver: GameOver =>
         gameOver
-      case current @ FrameComplete(frameNo, score, roll1, roll2, previous) =>
-        getNextState(frameNo + 1 ,
-          newScore + getBonus(previous, currentState = false) + getBonus(current, currentState = true),
-          pins, None, current)
+
+      case current@FrameComplete(frameNo, score, roll1, roll2, previous) =>
+        getNextState(frameNo + 1,
+          newScore + getPreviousBonus(current),
+          pins, None, Some(current))
 
       case FirstThrow(frameNo, score, roll1, previous) =>
         getNextState(frameNo, newScore, roll1, Some(pins), previous)
 
       case NotStarted =>
-        getNextState(1, newScore, pins, None, NotStarted)
+        getNextState(1, newScore, pins, None, Some(NotStarted))
     }
 
     this
   }
 
-  def getNextState(currentFrame: Int, newScore: Int, roll1: Int, roll2: Option[Int] = None, previous: Frame): Frame = {
+  def getNextState(currentFrame: Int, newScore: Int, roll1: Int, roll2: Option[Int] = None, previous: Option[FrameState]): FrameState = {
     roll2.fold({
       roll1 match {
         case 10 =>
@@ -80,31 +86,59 @@ class StateMachineBowlingGame extends BowlingGame {
 }
 
 
-sealed trait Frame {
+sealed trait FrameState {
   val frameNo: Int
   val score: Int
+  val previous: Option[FrameState] = None
 }
 
 case class FirstThrow(frameNo: Int,
                       score: Int,
                       roll1: Int,
-                      previous: Frame) extends Frame
+                      override val previous: Option[FrameState]) extends FrameState
 
 case class FrameComplete(frameNo: Int,
                          score: Int,
                          roll1: Int,
                          roll2: Int,
-                         previous: Frame) extends Frame
+                         override val previous: Option[FrameState]) extends FrameState {
+  def isStrike = roll1 == 10
 
-case class BonusShot(score: Int) extends Frame {
+  def isSpare = !isStrike && roll1 + roll2 == 10
+}
+
+case class BonusShot(score: Int) extends FrameState {
   override val frameNo: Int = 10
 }
 
-case class GameOver(score: Int) extends Frame {
+case class GameOver(score: Int) extends FrameState {
   override val frameNo: Int = 10
 }
 
-object NotStarted extends Frame {
+object NotStarted extends FrameState {
   override val frameNo: Int = 0
   override val score: Int = 0
+}
+
+
+object Strike {
+  def unapply(frame: FrameComplete): Option[Int] = {
+    if(frame.roll1 == 10) {
+      Some(frame.frameNo)
+    }
+    else {
+      None
+    }
+  }
+}
+
+object Spare {
+  def unapply(frame: FrameComplete): Option[Int] = {
+    if(frame.roll1 < 10 & (frame.roll1 + frame.roll2) == 10) {
+      Some(frame.frameNo)
+    }
+    else {
+      None
+    }
+  }
 }

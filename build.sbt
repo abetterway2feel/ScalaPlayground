@@ -12,7 +12,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j"               % akkaVersion,
   "com.typesafe.akka" %% "akka-agent"               % akkaVersion,
   "com.typesafe.akka" %% "akka-stream"              % akkaVersion,
+  "com.asprise.ocr"    % "java-ocr-api"             % "[15,)",
   "org.scalatest"     %% "scalatest"                % "2.2.6"     % Test
+
 )
 
 scalacOptions ++= Seq("-feature")

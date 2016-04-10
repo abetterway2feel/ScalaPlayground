@@ -1,18 +1,16 @@
 package com.abetterway2feel.playground.katas.bowling
 
 import com.abetterway2feel.playgorund.katas.bowling.inheritance.StateMachineBowlingGame
-import com.abetterway2feel.playgorund.katas.bowling.witharray.ArrayListBowlingGame
-import com.abetterway2feel.playgorund.katas.bowling.{GameOverException, BowlingGame}
 import com.abetterway2feel.playgorund.katas.bowling.linkedList.LinkedListBowlingGame
-import org.scalatest.{Matchers, FlatSpec}
+import com.abetterway2feel.playgorund.katas.bowling.witharray.ArrayListBowlingGame
+import com.abetterway2feel.playgorund.katas.bowling.{BowlingGame, GameOverException}
+import org.scalatest.{FlatSpec, Matchers}
 
-class BowlingGameSpec extends FlatSpec with Matchers {
+class StateMachineBowlingGameSpec extends FlatSpec with Matchers {
 
-  def linkedListVersion =  new LinkedListBowlingGame
-  def arrayListVersion =  new ArrayListBowlingGame
   def stateMachineVersion =  new StateMachineBowlingGame
 
-  def newGame: BowlingGame = {
+  def newGame: StateMachineBowlingGame = {
     stateMachineVersion
   }
 
@@ -32,12 +30,12 @@ class BowlingGameSpec extends FlatSpec with Matchers {
     newGame.roll(10).score should be(10)
   }
 
-  it should "be 30 after two strikes" in {
-    newGame.roll(10).roll(10).score should be(30)
+  it should "be 60 after three strikes and 2 gutters" in {
+    newGame.roll(10).roll(10).roll(10).roll(0).roll(0).score should be(60)
   }
 
   it should "be 29 after a single strike and two rolls" in {
-    newGame.roll(10).roll(3).roll(7).roll(5).roll(1).score should be(30)
+    newGame.roll(10).roll(3).roll(7).roll(5).roll(1).score should be(36)
   }
 
   it should "be 25 after 4 rolls of 5" in {
@@ -46,6 +44,8 @@ class BowlingGameSpec extends FlatSpec with Matchers {
       .roll(5)
       .roll(5)
       .roll(5)
+      .roll(0)
+      .roll(0)
       .score should be(25)
   }
 
@@ -63,6 +63,7 @@ class BowlingGameSpec extends FlatSpec with Matchers {
       .roll(10)
       .roll(10)
       .roll(10)
+     
       .score should be(300)
   }
 
@@ -167,32 +168,5 @@ class BowlingGameSpec extends FlatSpec with Matchers {
     }
   }
 
-
-  "The game " should "be over after 10 rolls" in {
-    intercept[GameOverException] {
-      newGame
-        .roll(1)
-        .roll(1) //1
-        .roll(1)
-        .roll(1) //2
-        .roll(1)
-        .roll(1) //3
-        .roll(1)
-        .roll(1) //4
-        .roll(1)
-        .roll(1) //5
-        .roll(1)
-        .roll(1) //6
-        .roll(1)
-        .roll(1) //7
-        .roll(1)
-        .roll(1) //8
-        .roll(1)
-        .roll(1) //9
-        .roll(1)
-        .roll(1) //10
-        .roll(1) //Game Over
-    }
-  }
 
 }
