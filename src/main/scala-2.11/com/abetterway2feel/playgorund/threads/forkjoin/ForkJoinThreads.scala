@@ -8,7 +8,6 @@ import scala.concurrent.forkjoin.ForkJoinPool
 object ForkJoinThreads extends App {
   private val commonPool: ForkJoinPool = ForkJoinPool.commonPool()
 
-  ForkJoinTask
 
   println(commonPool.getActiveThreadCount)
   println(commonPool.getPoolSize)

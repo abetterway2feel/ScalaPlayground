@@ -1,4 +1,4 @@
-package com.infoq.articles.scalajavamythsfacts
+package com.abetterway2feel.playgorund.infoq.articles.scalajavamythsfacts
 
 object FiboFunctional extends App {
   val fibs: Stream[BigInt] =
