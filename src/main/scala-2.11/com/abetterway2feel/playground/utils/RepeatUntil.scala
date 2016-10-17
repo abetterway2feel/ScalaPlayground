@@ -1,6 +1,7 @@
 package com.abetterway2feel.playground.utils
 
 import scala.language.postfixOps
+import scala.reflect.ClassTag
 
 object RepeatUntil {
 
@@ -32,6 +33,5 @@ object RepeatUntil {
       println(s"phil-$count")
     } UNTIL (count == 5)
   }
-
 
 }
